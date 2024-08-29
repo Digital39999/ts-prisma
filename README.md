@@ -126,6 +126,23 @@ const profileSchema = z.object({
 const parsedProfile = profileSchema.parse(user.profile);
 ```
 
+## Clean Models
+
+By default, `ts-prisma` generates models with all relationships included. If you want to generate models without relationships, you can use the `PrismaModelsClean` type.
+
+```typescript
+import { PrismaModelsClean } from 'ts-prisma';
+import { Prisma } from '@prisma/client';
+
+export type Models = PrismaModelsClean<Prisma.ModelName, Prisma.TypeMap>;
+
+export type User = Models['User'];
+export type Profile = Models['Profile'];
+
+// now user and profile models do not have relationships
+export type Test = User['profile'] // will throw an error
+```
+
 ## Circular References
 
 When using relationships in your Prisma schema, you may encounter circular references between models. To handle this, your reference from a child model to a parent model should be named per the parent model's name, with the first letter in lowercase.
@@ -148,6 +165,20 @@ model Profile {
   exampleUserId Int     @unique
   exampleUser   User    @relation(fields: [exampleUserId], references: [id]) // Reference named 'exampleUser'
 }
+```
+
+And then in your TypeScript code:
+
+```typescript
+import { PrismaModelsNonRecursive } from 'ts-prisma';
+import { Prisma } from '@prisma/client';
+
+export type Models = PrismaModelsNonRecursive<Prisma.ModelName, Prisma.TypeMap>;
+
+export type ExampleUser = Models['ExampleUser'];
+
+// now you cannot access the circular reference
+export type Test = ExampleUser['profile']['exampleUser'] // will throw an error
 ```
 
 ## Contributing
