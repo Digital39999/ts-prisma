@@ -27,13 +27,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd packages/nodejs
           npm install
 
       - name: Check if package needs publishing
         id: check_publish
         run: |
-          cd packages/nodejs
           current_version=$(node -p "require('./package.json').version")
           npm_package_name=$(node -p "require('./package.json').name")
           published_version=$(npm show $npm_package_name version) || echo "0.0.0"
@@ -51,13 +49,11 @@ jobs:
 
       - name: Build the project
         run: |
-          cd packages/nodejs
-          npm run build # Change this if you have a different build command
+          npm run build
 
       - name: Publish to npm
         if: env.publish == 'true'
         run: |
-          cd packages/nodejs
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
