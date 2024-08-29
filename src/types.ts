@@ -66,22 +66,22 @@ export type TransformObjectsWithoutRecursive<O extends TypeMapObject, PreviousNa
                             (ReferenceKey extends true
                                 ? OmitNameProperty<`${PreviousName}Id`, ExtractScalars<ExcludeNull<O[K][number]>>>
                                 : ExtractScalars<ExcludeNull<O[K][number]>>)
-                        > & TransformObjectsWithoutRecursive<OmitNameProperty<PreviousName, ExtractObjects<ExcludeNull<O[K][number]>>>, MakeFirstLetterLowercase<NonNullable<O[K][number]>['name']>>
+                         & TransformObjectsWithoutRecursive<OmitNameProperty<PreviousName, ExtractObjects<ExcludeNull<O[K][number]>>>, MakeFirstLetterLowercase<NonNullable<O[K][number]>['name']>, ReferenceKey>>
                     : Array<
                             (ReferenceKey extends true
                                 ? OmitNameProperty<`${PreviousName}Id`, ExtractScalars<ExcludeNull<O[K][number]>>>
                                 : ExtractScalars<ExcludeNull<O[K][number]>>)
-                        & TransformObjectsWithoutRecursive<ExtractObjects<ExcludeNull<O[K][number]>>, MakeFirstLetterLowercase<NonNullable<O[K][number]>['name']>>>
+                        & TransformObjectsWithoutRecursive<ExtractObjects<ExcludeNull<O[K][number]>>, MakeFirstLetterLowercase<NonNullable<O[K][number]>['name']>, ReferenceKey>>
                 : O[K] extends OnePayload
                     ? HasKey<ExtractObjects<ExcludeNull<O[K]>>, PreviousName> extends true
                         ? (ReferenceKey extends true
                             ? OmitNameProperty<`${PreviousName}Id`, ExtractScalars<ExcludeNull<O[K]>>>
                             : ExtractScalars<ExcludeNull<O[K]>>)
-                        & TransformObjectsWithoutRecursive<OmitNameProperty<PreviousName, ExtractObjects<ExcludeNull<O[K]>>>, MakeFirstLetterLowercase<NonNullable<O[K]>['name']>>
+                        & TransformObjectsWithoutRecursive<OmitNameProperty<PreviousName, ExtractObjects<ExcludeNull<O[K]>>>, MakeFirstLetterLowercase<NonNullable<O[K]>['name']>, ReferenceKey>
                     : (ReferenceKey extends true
                         ? OmitNameProperty<`${PreviousName}Id`, ExtractScalars<ExcludeNull<O[K]>>>
                         : OmitNameProperty<`${PreviousName}Id`, ExtractScalars<ExcludeNull<O[K]>>>)
-                    & TransformObjectsWithoutRecursive<ExtractObjects<ExcludeNull<O[K]>>, MakeFirstLetterLowercase<NonNullable<O[K]>['name']>>
+                    & TransformObjectsWithoutRecursive<ExtractObjects<ExcludeNull<O[K]>>, MakeFirstLetterLowercase<NonNullable<O[K]>['name']>, ReferenceKey>
                 : unknown
             : O[K];
 }

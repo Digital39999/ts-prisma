@@ -24,6 +24,7 @@
                 "allowSingleLine": true
             }
         ],
+        "@typescript-eslint/no-unused-vars": "warn",
         "@typescript-eslint/ban-ts-comment": "off",
         "@typescript-eslint/no-unsafe-declaration-merging": "off",
         "consistent-return": "off",

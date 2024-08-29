@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Test {
+  A
+  B
+  C
+}
+
+model User {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+
+  test Test
+
+  nestedObject NestedObject?
+  someArray    SomeArray[]
+}
+
+model NestedObject {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  levelDeeper      LevelDeeper?
+  levelDeeperArray LevelDeeperArray[]
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique
+}
+
+model SomeArray {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  evenDeeper      EvenDeeperProp?
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique
+}
+
+model LevelDeeper {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  evenDeeper EvenDeeper?
+
+  nestedObject   NestedObject @relation(fields: [nestedObjectId], references: [id])
+  nestedObjectId Int          @unique
+}
+
+model LevelDeeperArray {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  evenDeeperArray EvenDeeperArray[]
+
+  nestedObject   NestedObject @relation(fields: [nestedObjectId], references: [id])
+  nestedObjectId Int          @unique
+}
+
+model EvenDeeper {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  levelDeeper   LevelDeeper @relation(fields: [levelDeeperId], references: [id])
+  levelDeeperId Int         @unique
+}
+
+model EvenDeeperArray {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  levelDeeperArray   LevelDeeperArray @relation(fields: [levelDeeperArrayId], references: [id])
+  levelDeeperArrayId Int              @unique
+}
+
+model EvenDeeperProp {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  someArray   SomeArray @relation(fields: [someArrayId], references: [id])
+  someArrayId Int       @unique
+}

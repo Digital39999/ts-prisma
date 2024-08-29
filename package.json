@@ -1,5 +1,5 @@
 {
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"name": "ts-prisma",
 	"author": "Digital39999",
 	"scripts": {
@@ -8,6 +8,7 @@
 		"build": "tsc --build",
 		"watch": "tsc --watch",
 		"lint": "eslint . --ext .ts",
+		"postinstall": "pnpm prisma generate",
 		"updates": "pnpm npm-check-updates -i --format group"
 	},
 	"repository": "https://github.com/Digital39999/ts-prisma",
@@ -18,9 +19,13 @@
 		"@typescript-eslint/eslint-plugin": "^6.18.0",
 		"@typescript-eslint/parser": "^6.18.0",
 		"eslint": "^8.56.0",
+		"prisma": "^5.19.0",
 		"typescript": "^5.3.3"
 	},
 	"engines": {
 		"node": ">=20.2.0"
+	},
+	"dependencies": {
+		"@prisma/client": "^5.19.0"
 	}
 }
