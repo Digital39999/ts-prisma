@@ -130,7 +130,7 @@ const parsedProfile = profileSchema.parse(user.profile);
 
 When using relationships in your Prisma schema, you may encounter circular references between models. To handle this, your reference from a child model to a parent model should be named per the parent model's name, with the first letter in lowercase.
 
-For example, in the schema below, the `Profile` model has a reference to the `User` model named `user`. This naming convention allows `ts-prisma` to generate the correct types for circular references.
+For example, in the schema below, the `Profile` model has a reference to the `User` model named `exampleUser`. This naming convention allows `ts-prisma` to generate the correct types for circular references.
 
 ```prisma
 model ExampleUser {
@@ -146,7 +146,7 @@ model Profile {
   bio    String?
 
   exampleUserId Int     @unique
-  exampleUser   User    @relation(fields: [exampleUserId], references: [id]) // Reference named 'user'
+  exampleUser   User    @relation(fields: [exampleUserId], references: [id]) // Reference named 'exampleUser'
 }
 ```
 
