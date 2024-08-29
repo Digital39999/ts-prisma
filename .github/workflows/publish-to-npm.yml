@@ -27,7 +27,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install
+          npm i -g pnpm
+          pnpm install
 
       - name: Check if package needs publishing
         id: check_publish
@@ -49,7 +50,7 @@ jobs:
 
       - name: Build the project
         run: |
-          npm run build
+          pnpm run build
 
       - name: Publish to npm
         if: env.publish == 'true'
