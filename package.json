@@ -4,14 +4,11 @@
 	"author": "Digital39999",
 	"scripts": {
 		"ts": "pnpm install typescript --save-dev -g",
-		"init": "pnpm install && pnpm run build && pnpm run start",
 		"start": "node dist/index.js",
 		"build": "tsc --build",
 		"watch": "tsc --watch",
 		"lint": "eslint . --ext .ts",
-		"docs": "pnpm typedoc --out docs src --validation.notExported false",
-		"updates": "pnpm npm-check-updates -i --format group",
-		"prepublish": "pnpm run build && pnpm run docs"
+		"updates": "pnpm npm-check-updates -i --format group"
 	},
 	"repository": "https://github.com/Digital39999/ts-prisma",
 	"main": "dist/index.js",
