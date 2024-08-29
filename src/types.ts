@@ -33,6 +33,15 @@ export type TypeMapFields<FieldType extends Record<string, AnyType>> = {
     readonly [K in keyof FieldType]: AnyType;
 }
 
+export type RemoveDBIds<T, P extends keyof AnyType> =
+    T extends object
+        ? T extends AnyType[]
+            ? RemoveDBIds<T[number], P>[]
+            : {
+                [K in keyof T as K extends P ? never : K]: RemoveDBIds<T[K], P>
+            }
+        : T;
+
 export type TypeMapObject = Record<string, RealPayload>;
 export type ExtractScalars<T extends TypeMapPayload> = T['scalars'];
 export type ExtractObjects<T extends TypeMapPayload> = T['objects'];

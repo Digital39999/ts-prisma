@@ -143,6 +143,46 @@ export type Profile = Models['Profile'];
 export type Test = User['profile'] // will throw an error
 ```
 
+## Remove Model ID Fields
+
+When generating models, you may want to remove the @id fields from the generated models. You can do this by using the `RemoveDBIds` utility type as shown below:
+
+```prisma
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  name     String?
+
+  profile  Profile?
+}
+
+model Profile {
+  id     Int     @id @default(autoincrement())
+  bio    String?
+
+  userId Int     @unique
+  user   User    @relation(fields: [userId], references: [id])
+}
+```
+
+And then in your TypeScript code:
+
+```typescript
+import { PrismaModels, RemoveDBIds } from 'ts-prisma';
+import { Prisma } from '@prisma/client';
+
+export type Models = PrismaModels<Prisma.ModelName, Prisma.TypeMap>;
+
+// Remove the id fields from the generated models
+export type WithoutIdModels = RemoveDBIds<Models, 'id'>;
+export type User = WithoutIdModels['User']; // User model without id field
+
+// or
+
+export type User = Models['User'];
+export type UserWithoutId = RemoveDBIds<User, 'id'>; // User model without id field
+```
+
 ## Circular References
 
 When using relationships in your Prisma schema, you may encounter circular references between models. To handle this, your reference from a child model to a parent model should be named per the parent model's name, with the first letter in lowercase, and similarly named id field.

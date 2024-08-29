@@ -3,4 +3,5 @@ export {
 	PrismaModels,
 	PrismaModelsClean,
 	PrismaModelsNonRecursive,
+	RemoveDBIds,
 } from './types';
