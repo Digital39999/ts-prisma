@@ -181,6 +181,23 @@ export type ExampleUser = Models['ExampleUser'];
 export type Test = ExampleUser['profile']['exampleUser'] // will throw an error
 ```
 
+### Remove relation id fields
+
+Additionally, you can remove the relation id fields from the generated models by using the `PrismaModelsNonRecursive` type. Which just like the previous example, it will remove the relation fields from the generated models, but it will also remove the id fields from the relations.
+
+```typescript
+import { PrismaModelsNonRecursive } from 'ts-prisma';
+import { Prisma } from '@prisma/client';
+
+export type Models = PrismaModelsNonRecursive<Prisma.ModelName, Prisma.TypeMap, true>;
+
+export type ExampleUser = Models['ExampleUser'];
+
+// now you cannot access the circular reference nor its id
+export type Test = ExampleUser['profile']['exampleUser'] // will throw an error
+export type Test2 = ExampleUser['profile']['exampleUserId'] // will throw an error as well
+```
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request if you have any ideas or improvements.
