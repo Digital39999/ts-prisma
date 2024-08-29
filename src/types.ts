@@ -1,4 +1,4 @@
-export type AnyType = never;
+export type AnyType = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 export type PrismaModels<ModelName extends string, TypeMap extends {
     model: Record<ModelName, {
