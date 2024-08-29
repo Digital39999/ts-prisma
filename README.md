@@ -145,7 +145,7 @@ export type Test = User['profile'] // will throw an error
 
 ## Circular References
 
-When using relationships in your Prisma schema, you may encounter circular references between models. To handle this, your reference from a child model to a parent model should be named per the parent model's name, with the first letter in lowercase.
+When using relationships in your Prisma schema, you may encounter circular references between models. To handle this, your reference from a child model to a parent model should be named per the parent model's name, with the first letter in lowercase, and similarly named id field.
 
 For example, in the schema below, the `Profile` model has a reference to the `User` model named `exampleUser`. This naming convention allows `ts-prisma` to generate the correct types for circular references.
 
@@ -162,7 +162,7 @@ model Profile {
   id     Int     @id @default(autoincrement())
   bio    String?
 
-  exampleUserId Int     @unique
+  exampleUserId Int     @unique // Reference id field named 'exampleUserId'
   exampleUser   User    @relation(fields: [exampleUserId], references: [id]) // Reference named 'exampleUser'
 }
 ```
