@@ -8,7 +8,7 @@
 		"build": "tsc --build",
 		"watch": "tsc --watch",
 		"lint": "eslint . --ext .ts",
-		"postinstall": "pnpm prisma generate",
+		"postinstall": "pnpm run build && pnpm prisma generate",
 		"updates": "pnpm npm-check-updates -i --format group"
 	},
 	"repository": "https://github.com/Digital39999/ts-prisma",
