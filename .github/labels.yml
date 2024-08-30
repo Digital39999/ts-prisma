@@ -1,36 +1,28 @@
 labels:
   - name: "🐛 Bug"
-    color: "6cc644" # Light green
+    color: "6cc644"
     description: "Something isn't working"
-  
   - name: "✨ Feature Request"
-    color: "ffeb3b" # Light yellow
+    color: "ffeb3b"
     description: "Request for a new feature"
-
   - name: "🛠️ Enhancement"
-    color: "d2b48c" # Light brown/tan
+    color: "d2b48c"
     description: "Improvement to an existing feature"
-
   - name: "📚 Documentation"
-    color: "00cfff" # Cyan
+    color: "00cfff"
     description: "Improvements or additions to documentation"
-
   - name: "❓ Question"
-    color: "e1bee7" # Light purple
+    color: "e1bee7"
     description: "Further information is requested"
-
   - name: "🚀 Performance"
-    color: "ffffff" # White
+    color: "ffffff"
     description: "Performance-related issues or enhancements"
-
   - name: "🔍 Investigation"
-    color: "b3e5fc" # Light blue
+    color: "b3e5fc"
     description: "Further research or exploration is needed"
-
   - name: "⚠️ Deprecated"
-    color: "fff176" # Light yellow, as you wanted deprecated to be yellow as well
+    color: "fff176"
     description: "Feature or functionality is being deprecated"
-
   - name: "🔴 Critical"
-    color: "ff1744" # Bright red
+    color: "ff1744"
     description: "Top priority issue"
