@@ -1,4 +1,6 @@
-import { PrismaEnums, PrismaModels, PrismaModelsClean, PrismaModelsNonRecursive } from '../index';
+/* eslint-disable */
+
+import { PrismaEnums, PrismaModels, PrismaModelsClean, PrismaModelsNonRecursive } from '../src/index';
 import { Prisma, $Enums } from '@prisma/client';
 
 /* eslint-disable */
