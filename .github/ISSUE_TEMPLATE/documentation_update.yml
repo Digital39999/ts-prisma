@@ -1,0 +1,35 @@
+name: 📚 Documentation Update
+description: Suggest improvements or corrections to the documentation.
+title: "[DOCS] "
+labels: [documentation]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us improve the `ts-prisma` documentation! Please provide details about the needed update.
+  - type: input
+    id: section
+    attributes:
+      label: Section to Update
+      description: Specify the part of the documentation that needs improvement (e.g., "Usage Examples," "API Reference").
+    validations:
+      required: true
+  - type: textarea
+    id: issue_description
+    attributes:
+      label: Description of Issue
+      description: Describe the problem with the current documentation.
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_changes
+    attributes:
+      label: Proposed Changes
+      description: Provide specific suggestions for improving the documentation.
+    validations:
+      required: true
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Add any other relevant information or context.

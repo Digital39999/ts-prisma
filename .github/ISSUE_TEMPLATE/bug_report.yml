@@ -1,0 +1,74 @@
+name: 🐛 Bug Report
+description: Report a bug or unexpected behavior in `ts-prisma`.
+title: "[BUG] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please fill out the following details to help us understand the issue.
+  - type: input
+    id: description
+    attributes:
+      label: Describe the bug
+      description: Provide a clear and concise description of the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Provide a minimal code example or a set of steps to reproduce the bug.
+    validations:
+      required: true
+  - type: input
+    id: expected_behavior
+    attributes:
+      label: Expected Behavior
+      description: Explain what you expected to happen.
+    validations:
+      required: true
+  - type: input
+    id: actual_behavior
+    attributes:
+      label: Actual Behavior
+      description: Describe what actually happened, including any error messages.
+    validations:
+      required: true
+  - type: dropdown
+    id: node_version
+    attributes:
+      label: Node.js Version
+      description: Select the Node.js version you're using.
+      options:
+        - 20.x
+        - 22.x
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: prisma_version
+    attributes:
+      label: Prisma Version
+      description: Provide the Prisma version you're using.
+    validations:
+      required: true
+  - type: input
+    id: ts_prisma_version
+    attributes:
+      label: ts-prisma Version
+      description: Provide the version of `ts-prisma` you're using.
+    validations:
+      required: true
+  - type: input
+    id: typescript_version
+    attributes:
+      label: TypeScript Version
+      description: Provide the TypeScript version you're using.
+    validations:
+      required: true
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Add any other relevant information or context about the issue.

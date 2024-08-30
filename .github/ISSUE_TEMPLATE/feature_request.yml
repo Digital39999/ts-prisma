@@ -1,0 +1,33 @@
+name: 💡 Feature Request
+description: Suggest a new feature or enhancement for `ts-prisma`.
+title: "[FEATURE] "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your interest in improving `ts-prisma`! Please provide details about your feature request.
+  - type: input
+    id: problem_statement
+    attributes:
+      label: Problem Statement
+      description: Describe the problem you're trying to solve.
+    validations:
+      required: true
+  - type: input
+    id: proposed_solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the feature or enhancement you would like to see.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe any alternative solutions or workarounds you've considered.
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Add any other relevant information or context.
