@@ -61,7 +61,7 @@ export async function db<
 	operation: M,
 	args: TSPrisma.Args<A, T, M>,
 ): Promise<TSPrisma.Result<A, T, M>> {
-  return await prisma[modelName][operation](args);
+  return await prisma[modelName][operation](args) as never; // yes this is needed
 }
 ```
 
