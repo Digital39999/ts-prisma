@@ -1,5 +1,5 @@
 {
-	"version": "1.0.6",
+	"version": "1.1.0",
 	"name": "ts-prisma",
 	"author": "Digital39999",
 	"scripts": {
@@ -13,6 +13,9 @@
 	},
 	"repository": "https://github.com/Digital39999/ts-prisma",
 	"main": "dist/index.js",
+	"bin": {
+		"ts-prisma-generator": "dist/cli.js"
+	},
 	"license": "MIT",
 	"devDependencies": {
 		"@types/node": "^20.14.13",
@@ -26,6 +29,7 @@
 		"node": ">=20.2.0"
 	},
 	"dependencies": {
-		"@prisma/client": "^5.19.0"
+		"@prisma/client": "^5.19.0",
+		"@prisma/generator-helper": "^5.19.0"
 	}
 }

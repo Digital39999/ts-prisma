@@ -1,6 +1,6 @@
 # ts-prisma
 
-`ts-prisma` is a TypeScript utility package that simplifies working with Prisma models and enums. It provides type-safe interfaces for your Prisma schema, allowing for easier integration with tools like `zod` or other validation libraries.
+`ts-prisma` is a TypeScript utility package that simplifies working with Prisma models and enums. It provides type-safe interfaces for your Prisma schema, allowing for easier integration with tools like `zod` or other validation libraries. `ts-prisma` also provides a function abstraction for Prisma queries, making it easier to define and execute queries in a type-safe way and many more utilities to make your life easier when working with Prisma.
 
 ## Installation
 
@@ -17,7 +17,93 @@ npm install -D prisma
 npm install @prisma/client
 ```
 
-## Getting Started
+# Usage
+
+<details>
+<summary style="font-size: 1.5rem; font-weight: bold;">Function Abstraction</summary>
+
+## Function Abstraction!!
+
+`ts-prisma` also provides a function abstraction for Prisma queries. This abstraction allows you to define your queries in a type-safe way and use them throughout your application if you need or want to have a simple way to define your queries, for example, when you have to execute it in a different context.
+
+### Using the Function Abstraction
+
+To make use of the function abstraction easier as possible, we have made it export TSPrisma namespace, which contains all the necessary types and functions to define your queries.
+Here's an example of how to define a query function using the function abstraction:
+
+```typescript
+import { TSPrisma } from '@prisma/client';
+
+export async function db<
+  T extends TSPrisma.AllModelNamesLowercase,
+	M extends TSPrisma.AllPrismaMethodsLowercase,
+	A extends TSPrisma.AllArgs[T][M],
+>(
+	modelName: T,
+	operation: M,
+	args: TSPrisma.Args<A, T, M>,
+): Promise<TSPrisma.Result<A, T, M>> {
+  return await prisma[modelName][operation](args);
+}
+```
+
+It's really that simple! Now you can use the `db` function to execute your queries.
+</details>
+
+<details>
+<summary style="font-size: 1.5rem; font-weight: bold;">Type Maps</summary>
+
+## Type Maps!!
+
+`ts-prisma` also provides a utility types for various use cases. Check the examples below to see how to use them.
+
+### List of all Models
+
+```typescript
+import { TSPrisma } from '@prisma/client';
+
+// List of all models and enums
+type AllModels = TSPrisma.AllModelNames;
+
+// even better, you can use the AllModelNamesLowercase to get the models in lowercase
+type AllModelsLowercase = TSPrisma.AllModelNamesLowercase;
+```
+
+### Advanced Usage
+
+For more advanced users, we've also provided some more complex types as well.
+
+```typescript
+import { TSPrisma } from '@prisma/client';
+
+// List of all models and their methods
+type AllModelsAndMethods = TSPrisma.TSPrismaModels;
+/* 
+{
+  User: {
+    FindUnique: {
+      select: {
+        ...
+      }
+    },
+    ...
+  },
+  ...
+}
+*/
+
+// All Prisma Clients of each model, useful for generating your own input types
+type AllPrismaClients = TSPrisma.TSPrismaClients;
+
+// And lastly, all payloads of each method of each model
+type AllPayloads = TSPrisma.TSPrismaPayloads;
+```
+</details>
+
+<details>
+<summary style="font-size: 1.5rem; font-weight: bold;">Raw Models and Enums</summary>
+
+## Raw Models and Enums
 
 ### Defining a Prisma Schema
 
@@ -33,6 +119,10 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+generator tsPrisma {
+  provider = "ts-prisma-generator"
 }
 
 model User {
@@ -70,7 +160,7 @@ After defining your Prisma schema, you can generate the Prisma client using the 
 npx prisma generate
 ```
 
-### Generating Types with `ts-prisma`
+### Retrieving Type-Safe Interfaces
 
 Once you have generated the Prisma client, you can use `ts-prisma` to generate type-safe interfaces for your models and enums.
 
@@ -79,12 +169,9 @@ Here’s an example of how to generate types using `ts-prisma`:
 ```typescript
 import { PrismaModels, PrismaEnums } from 'ts-prisma';
 import { $Enums, Prisma } from '@prisma/client';
-import { z } from 'zod';
 
-// Generate type-safe models
+// Generate type-safe models and enums
 export type Models = PrismaModels<Prisma.ModelName, Prisma.TypeMap>;
-
-// Generate type-safe enums
 export type Enums = PrismaEnums<typeof $Enums>;
 
 // Interfaces for specific models
@@ -116,14 +203,6 @@ const user: User = {
     },
   ],
 };
-
-const profileSchema = z.object({
-  id: z.number(),
-  bio: z.string().optional(),
-  userId: z.number(),
-});
-
-const parsedProfile = profileSchema.parse(user.profile);
 ```
 
 ## Clean Models
@@ -239,6 +318,7 @@ export type ExampleUser = Models['ExampleUser'];
 export type Test = ExampleUser['profile']['exampleUser'] // will throw an error
 export type Test2 = ExampleUser['profile']['exampleUserId'] // will throw an error as well
 ```
+</details>
 
 ## Contributing
 

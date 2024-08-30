@@ -50,13 +50,15 @@ export type OnePayload = TypeMapPayload | null;
 export type ManyPayloads = Array<TypeMapPayload>;
 export type RealPayload = OnePayload | ManyPayloads;
 
+export type FirstLowercase<S extends string> = S extends `${infer F}${infer R}` ? `${Lowercase<F>}${R}` : S;
+export type FirstUppercase<S extends string> = S extends `${infer F}${infer R}` ? `${Uppercase<F>}${R}` : S;
+
 export type HasKey<B, A extends string> = A extends keyof B ? true : false;
-export type MakeFirstLetterLowercase<S extends string> = S extends `${infer F}${infer R}` ? `${Lowercase<F>}${R}` : S;
 export type OmitNameProperty<Name extends string, T extends TypeMapPayload['objects']> = {
     [K in Exclude<keyof T, Name>]: T[K];
 }
 
-export type TransformPayloadWithoutRecursive<T extends TypeMapPayload, ReferenceKey extends boolean = false> = ExtractScalars<T> & TransformObjectsWithoutRecursive<ExtractObjects<T>, MakeFirstLetterLowercase<T['name']>, ReferenceKey>;
+export type TransformPayloadWithoutRecursive<T extends TypeMapPayload, ReferenceKey extends boolean = false> = ExtractScalars<T> & TransformObjectsWithoutRecursive<ExtractObjects<T>, FirstLowercase<T['name']>, ReferenceKey>;
 export type TransformObjectsWithoutRecursive<O extends TypeMapObject, PreviousName extends string, ReferenceKey extends boolean = false> = {
     [K in keyof O]:
         O[K] extends RealPayload
@@ -66,22 +68,22 @@ export type TransformObjectsWithoutRecursive<O extends TypeMapObject, PreviousNa
                             (ReferenceKey extends true
                                 ? OmitNameProperty<`${PreviousName}Id`, ExtractScalars<ExcludeNull<O[K][number]>>>
                                 : ExtractScalars<ExcludeNull<O[K][number]>>)
-                         & TransformObjectsWithoutRecursive<OmitNameProperty<PreviousName, ExtractObjects<ExcludeNull<O[K][number]>>>, MakeFirstLetterLowercase<NonNullable<O[K][number]>['name']>, ReferenceKey>>
+                         & TransformObjectsWithoutRecursive<OmitNameProperty<PreviousName, ExtractObjects<ExcludeNull<O[K][number]>>>, FirstLowercase<NonNullable<O[K][number]>['name']>, ReferenceKey>>
                     : Array<
                             (ReferenceKey extends true
                                 ? OmitNameProperty<`${PreviousName}Id`, ExtractScalars<ExcludeNull<O[K][number]>>>
                                 : ExtractScalars<ExcludeNull<O[K][number]>>)
-                        & TransformObjectsWithoutRecursive<ExtractObjects<ExcludeNull<O[K][number]>>, MakeFirstLetterLowercase<NonNullable<O[K][number]>['name']>, ReferenceKey>>
+                        & TransformObjectsWithoutRecursive<ExtractObjects<ExcludeNull<O[K][number]>>, FirstLowercase<NonNullable<O[K][number]>['name']>, ReferenceKey>>
                 : O[K] extends OnePayload
                     ? HasKey<ExtractObjects<ExcludeNull<O[K]>>, PreviousName> extends true
                         ? (ReferenceKey extends true
                             ? OmitNameProperty<`${PreviousName}Id`, ExtractScalars<ExcludeNull<O[K]>>>
                             : ExtractScalars<ExcludeNull<O[K]>>)
-                        & TransformObjectsWithoutRecursive<OmitNameProperty<PreviousName, ExtractObjects<ExcludeNull<O[K]>>>, MakeFirstLetterLowercase<NonNullable<O[K]>['name']>, ReferenceKey>
+                        & TransformObjectsWithoutRecursive<OmitNameProperty<PreviousName, ExtractObjects<ExcludeNull<O[K]>>>, FirstLowercase<NonNullable<O[K]>['name']>, ReferenceKey>
                     : (ReferenceKey extends true
                         ? OmitNameProperty<`${PreviousName}Id`, ExtractScalars<ExcludeNull<O[K]>>>
                         : OmitNameProperty<`${PreviousName}Id`, ExtractScalars<ExcludeNull<O[K]>>>)
-                    & TransformObjectsWithoutRecursive<ExtractObjects<ExcludeNull<O[K]>>, MakeFirstLetterLowercase<NonNullable<O[K]>['name']>, ReferenceKey>
+                    & TransformObjectsWithoutRecursive<ExtractObjects<ExcludeNull<O[K]>>, FirstLowercase<NonNullable<O[K]>['name']>, ReferenceKey>
                 : unknown
             : O[K];
 }
