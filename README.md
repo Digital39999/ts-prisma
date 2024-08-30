@@ -19,6 +19,24 @@ npm install @prisma/client
 
 # Usage
 
+## Generator
+
+`ts-prisma` provides a generator that will generate the necessary types for your Prisma schema. To use the generator, add the following to your `schema.prisma` file:
+
+```prisma
+generator tsPrisma {
+  provider = "ts-prisma-generator"
+}
+```
+
+Then run the following command to generate the types:
+
+```bash
+npx prisma generate
+```
+
+## Basic Usage
+
 <details>
 <summary style="font-size: 1.5rem; font-weight: bold;">Function Abstraction</summary>
 
