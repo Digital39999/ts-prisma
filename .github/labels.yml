@@ -25,3 +25,6 @@
 - name: "🔴 Critical"
   color: "ff1744"
   description: "Top priority issue"
+- name: "❌ Invalid"
+  color: "000000"
+  description: "No"
