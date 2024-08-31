@@ -66,13 +66,13 @@ generatorHandler({
 		*/
 
 		let TSPrismaNamespace = '';
-		TSPrismaNamespace += 'import { Prisma, TSPrisma, TSPrismaClients, TSPrismaPayloads } from \'@prisma/client\';' + nl;
+		TSPrismaNamespace += 'import { Prisma, TSPrismaClients, TSPrismaPayloads } from \'@prisma/client\';' + nl;
 		TSPrismaNamespace += 'import { DefaultArgs, GetResult } from \'@prisma/client/runtime/library\';' + nl;
 		TSPrismaNamespace += 'import { FirstLowercase, FirstUppercase } from \'ts-prisma\';' + nl + nl;
 
-		TSPrismaNamespace += 'export type AllModelNames = keyof TSPrisma;' + nl;
+		TSPrismaNamespace += 'export type AllModelNames = keyof TSPrismaModels;' + nl;
 		TSPrismaNamespace += 'export type AllModelNamesLowercase = FirstLowercase<AllModelNames>;' + nl;
-		TSPrismaNamespace += 'export type AllPrismaMethods = keyof TSPrisma[keyof TSPrisma];' + nl;
+		TSPrismaNamespace += 'export type AllPrismaMethods = keyof TSPrismaModels[keyof TSPrismaModels];' + nl;
 		TSPrismaNamespace += 'export type AllPrismaMethodsLowercase = FirstLowercase<AllPrismaMethods>;' + nl + nl;
 
 		TSPrismaNamespace += 'export type Args<T, M extends AllModelNamesLowercase, A extends AllPrismaMethodsLowercase> = Prisma.SelectSubset<T, AllArgs[FirstLowercase<M>][A]>;' + nl;
@@ -80,7 +80,7 @@ generatorHandler({
 
 		TSPrismaNamespace += 'export type AllArgs<A extends DefaultArgs = DefaultArgs> = {' + nl;
 		TSPrismaNamespace += '  [T in AllModelNames as FirstLowercase<T>]: {' + nl;
-		TSPrismaNamespace += '    [K in AllPrismaMethods as FirstLowercase<K>]: TSPrisma<A>[T][K];' + nl;
+		TSPrismaNamespace += '    [K in AllPrismaMethods as FirstLowercase<K>]: TSPrismaModels<A>[T][K];' + nl;
 		TSPrismaNamespace += '  };' + nl;
 		TSPrismaNamespace += '};' + nl + nl;
 
