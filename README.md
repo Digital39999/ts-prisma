@@ -54,12 +54,12 @@ import { TSPrisma } from '@prisma/client';
 
 export async function db<
   T extends TSPrisma.AllModelNamesLowercase,
-	M extends TSPrisma.AllPrismaMethodsLowercase,
-	A extends TSPrisma.AllArgs[T][M],
+  M extends TSPrisma.AllPrismaMethodsLowercase,
+  A extends TSPrisma.AllArgs[T][M],
 >(
-	modelName: T,
-	operation: M,
-	args: TSPrisma.Args<A, T, M>,
+  modelName: T,
+  operation: M,
+  args: TSPrisma.Args<A, T, M>,
 ): Promise<TSPrisma.Result<A, T, M>> {
   return await (prisma[modelName][operation] as TSPrisma.Callable)(args); // yes this Callable is needed because https://github.com/microsoft/TypeScript/issues/33014
 }
