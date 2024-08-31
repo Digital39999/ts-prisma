@@ -1,5 +1,5 @@
 name: 🐛 Bug Report
-description: Report a bug or unexpected behavior in `ts-prisma`.
+description: Report a bug or unexpected behavior in ts-prisma.
 title: "[BUG] "
 labels: [bug]
 body:
