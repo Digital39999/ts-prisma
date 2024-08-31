@@ -61,7 +61,7 @@ export async function db<
   operation: M,
   args: TSPrisma.Args<A, T, M>,
 ): Promise<TSPrisma.Result<A, T, M>> {
-  return await (prisma[modelName][operation] as TSPrisma.Callable)(args); // yes this Callable is needed because https://github.com/microsoft/TypeScript/issues/33014
+  return await (prisma[modelName][operation] as TSPrisma.Callable)(args) as never; // yes this Callable is needed because https://github.com/microsoft/TypeScript/issues/33014
 }
 ```
 
