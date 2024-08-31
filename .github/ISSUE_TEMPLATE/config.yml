@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "Bug Report"
+    url: https://github.com/Digital39999/ts-prisma/issues/new?assignees=&labels=bug&template=bug_report.yml&title=
+    about: "Report a bug or unexpected behavior in ts-prisma."
+  - name: "Feature Request"
+    url: https://github.com/Digital39999/ts-prisma/issues/new?assignees=&labels=enhancement&template=feature_request.yml&title=
+    about: "Suggest a new feature or improvement for ts-prisma."
+  - name: "Documentation Update"
+    url: https://github.com/Digital39999/ts-prisma/issues/new?assignees=&labels=documentation&template=documentation_update.yml&title=
+    about: "Suggest improvements or corrections to the documentation."
+  - name: "General Question"
+    url: https://github.com/Digital39999/ts-prisma/discussions/new?category=q-a
+    about: "Ask a question about using ts-prisma."
