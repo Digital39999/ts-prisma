@@ -65,15 +65,18 @@ generatorHandler({
 			};
 		*/
 
-		let TSPrismaNamespace = '';
-		TSPrismaNamespace += 'import { Prisma, TSPrismaClients, TSPrismaPayloads } from \'@prisma/client\';' + nl;
-		TSPrismaNamespace += 'import { DefaultArgs, GetResult } from \'@prisma/client/runtime/library\';' + nl;
-		TSPrismaNamespace += 'import { FirstLowercase, FirstUppercase } from \'ts-prisma\';' + nl + nl;
+		let TSPrismaImports = '';
+		TSPrismaImports += 'import { DefaultArgs, GetResult } from \'@prisma/client/runtime/library\';' + nl;
+		TSPrismaImports += 'import { FirstLowercase, FirstUppercase } from \'ts-prisma\';' + nl;
+		TSPrismaImports += 'import { Prisma } from \'@prisma/client\';' + nl + nl;
 
+		let TSPrismaNamespace = '';
 		TSPrismaNamespace += 'export type AllModelNames = keyof TSPrismaModels;' + nl;
 		TSPrismaNamespace += 'export type AllModelNamesLowercase = FirstLowercase<AllModelNames>;' + nl;
 		TSPrismaNamespace += 'export type AllPrismaMethods = keyof TSPrismaModels[keyof TSPrismaModels];' + nl;
 		TSPrismaNamespace += 'export type AllPrismaMethodsLowercase = FirstLowercase<AllPrismaMethods>;' + nl + nl;
+
+		TSPrismaNamespace += 'export type Callable = <T>(...args: T[]) => unknown;' + nl + nl;
 
 		TSPrismaNamespace += 'export type Args<T, M extends AllModelNamesLowercase, A extends AllPrismaMethodsLowercase> = Prisma.SelectSubset<T, AllArgs[FirstLowercase<M>][A]>;' + nl;
 		TSPrismaNamespace += 'export type Result<T, M extends AllModelNamesLowercase, A extends AllPrismaMethodsLowercase> = TSPrismaClients<GetResult<TSPrismaPayloads<DefaultArgs>[FirstUppercase<M>], T, A> | null, null, DefaultArgs>[FirstUppercase<M>];' + nl + nl;
@@ -103,7 +106,9 @@ generatorHandler({
 		const defaultExport = fs.readFileSync(path.join(actualIndexFolder, 'default.d.ts'), 'utf-8').trim();
 		fs.writeFileSync(path.join(actualIndexFolder, 'default.d.ts'), defaultExport + nl + 'export * from \'./ts-prisma.d.ts\'');
 
-		fs.writeFileSync(path.join(actualIndexFolder, 'ts-prisma.d.ts'), wrapAndIndentInNamespace('TSPrisma', TSPrismaNamespace));
+
+		const tsPrismaFile = TSPrismaImports + wrapAndIndentInNamespace('TSPrisma', TSPrismaNamespace);
+		fs.writeFileSync(path.join(actualIndexFolder, 'ts-prisma.d.ts'), tsPrismaFile);
 		console.log('TS Prisma types generated!');
 	},
 });
