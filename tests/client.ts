@@ -3,15 +3,36 @@ import { TSPrisma, PrismaClient } from '@prisma/client';
 /* eslint-disable */
 
 type ItWorks = TSPrisma.TSPrismaModels['User']['FindFirst'];
-
 // const UserIncludes = TSPrisma.Includes['User'];
-const yes = JSON.stringify(TSPrisma.Includes['User']['FindFirst'], null, 2);
 
 const prisma = new PrismaClient();
 (async () => {
+	await prisma.$connect();
+
+	await prisma.user.deleteMany({
+		where: {
+			email: 'contact@crni.xyz',
+		},
+	})
+
+	await prisma.user.create({
+		data: {
+			email: 'contact@crni.xyz',
+			test: 'A',
+			nestedObject: {
+				create: {
+					name: 'Digital',
+				},
+			},
+		},
+	});
+
 	const user = await prisma.user.findFirst({
 		...TSPrisma.Functions.getIncludes('User', 'FindFirst'),
+		where: {
+			email: 'contact@crni.xyz',
+		},
 	});
-})();
 
-console.log(yes);
+	console.log(user);
+})();
