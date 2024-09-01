@@ -1,5 +1,5 @@
 {
-	"version": "1.2.2",
+	"version": "1.2.3",
 	"name": "ts-prisma",
 	"author": "Digital39999",
 	"scripts": {
@@ -8,7 +8,6 @@
 		"build": "tsc --build",
 		"watch": "tsc --watch",
 		"lint": "eslint . --ext .ts",
-		"postinstall": "pnpm run build && pnpm prisma generate",
 		"updates": "pnpm npm-check-updates -i --format group"
 	},
 	"repository": "https://github.com/Digital39999/ts-prisma",
