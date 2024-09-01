@@ -33,6 +33,20 @@ const prisma = new PrismaClient();
 			email: 'contact@crni.xyz',
 		},
 	});
+	if (!user) return console.error('User not found');
+
+	type User = typeof user;
+	type UserFull = TSPrisma.TSPrismaModelsFull['User'];
+
+	type DoesMatch<F, S> = F extends S ? S extends F ? true : false : false;
+	type UserMatches = DoesMatch<User, UserFull>;
+	//    ^ = type UserMatches = true	
+
+	function test(user: UserFull) {
+		console.log(user);
+	}
+
+	test(user);
 
 	console.log(user);
 })();

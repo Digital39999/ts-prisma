@@ -240,9 +240,7 @@ npx prisma generate
 
 ### Retrieving Type-Safe Interfaces
 
-Once you have generated the Prisma client, you can use `ts-prisma` to generate type-safe interfaces for your models and enums.
-
-Here’s an example of how to generate types using `ts-prisma`:
+Once you have generated the Prisma client, you can use `ts-prisma` to generate type-safe interfaces for your models with relationships and enums. Here’s an example of how to generate types using `ts-prisma`:
 
 ```typescript
 import { PrismaModels, PrismaEnums } from 'ts-prisma';
@@ -256,6 +254,29 @@ export type Enums = PrismaEnums<typeof $Enums>;
 export type User = Models['User'];
 export type Profile = Models['Profile'];
 export type Post = Models['Post'];
+```
+
+This will 99% satisfy your needs, however, if you use this alongside with our automatic includes, you will have to use the example below to get full model types with all relationships. This is because the models from Prisma's type map don't exactly match the result of the automatic include function (which is a good thing, because it's more specific). Anyway, here's how you can get the full model types:
+
+```typescript
+import { TSPrisma, PrismaClient } from '@prisma/client';
+
+type UserFull = TSPrisma.TSPrismaModelsFull['User'];
+
+const prisma = new PrismaClient();
+
+(async () => {
+  const user = await prisma.user.findUnique({
+    ...TSPrisma.Functions.getIncludesLowercase('user', 'findUnique'),
+    where: { id: 1 },
+  });
+
+  function doSomething(user: UserFull) {
+    console.log(user.profile.bio);
+  }
+
+  doSomething(user); // this will work
+})();
 ```
 
 ### Using the Generated Types
