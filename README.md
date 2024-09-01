@@ -122,6 +122,7 @@ export async function db<
 
   console.log(user.someObject);
 ```
+</details>
 
 <details>
 <summary>Type Maps</summary>
