@@ -107,7 +107,7 @@ export function generateDeclarations(models: string[]) {
 	TSPrismaNamespace += 'export type AllModelNamesLowercase = FirstLowercase<AllModelNames>;' + nl(2);
 
 	TSPrismaNamespace += 'export type AllPrismaMethods = RemoveDefault<keyof TSPrismaModels[keyof TSPrismaModels]>;' + nl(1);
-	TSPrismaNamespace += 'AllPrismaMethodsLowercase = RemoveDefault<FirstLowercase<AllPrismaMethods>>;' + nl(2);
+	TSPrismaNamespace += 'export type AllPrismaMethodsLowercase = RemoveDefault<FirstLowercase<AllPrismaMethods>>;' + nl(2);
 
 	TSPrismaNamespace += 'export type Callable = <T>(...args: T[]) => unknown;' + nl(1);
 	TSPrismaNamespace += 'export type RemoveDefault<T> = Exclude<T, \'Default\' | \'default\'>;' + nl(2);
