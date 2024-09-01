@@ -46,6 +46,7 @@ const prismaSchemaInfinite = `
 
 		export type UserInclude = {
 			nestedObject?: boolean | NestedObjectArgs;
+			_test?: boolean | NestedObjectArgs;
 		};
 
 		export type NestedObjectArgs = {
@@ -71,18 +72,3 @@ const prismaSchemaInfinite = `
 
 // console.log(JSON.stringify(generateIncludes(prismaSchema), null, 2));
 console.log(JSON.stringify(generateIncludes(prismaSchemaInfinite), null, 2));
-
-/* expected output:
-{
-	"Name": {
-		"User": {
-			include: {
-				nestedObject: {
-					include: {
-						levelDeeper: true,
-					},
-				},
-			},
-  	},
-}
-*/

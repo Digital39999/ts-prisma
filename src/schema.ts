@@ -116,11 +116,11 @@ export function filterSchema(schema: RuntimeSchema): IncludeStructure {
 	const result: IncludeStructure = {};
 
 	for (const key in schema) {
+		if (key.startsWith('_')) continue;
 		const value = schema[key];
 
 		if (value && typeof value === 'object') {
 			const keys = Object.keys(value);
-
 			if (keys.includes('include') && value.include) {
 				const includedSchema = filterSchema(value.include);
 				if (Object.keys(includedSchema).length) {
