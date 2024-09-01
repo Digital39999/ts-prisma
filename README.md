@@ -40,7 +40,7 @@ npx prisma generate
 <details>
 <summary>Function Abstraction</summary>
 
-## Function Abstraction!!
+## Function Abstraction
 
 `ts-prisma` also provides a function abstraction for Prisma queries. This abstraction allows you to define your queries in a type-safe way and use them throughout your application if you need or want to have a simple way to define your queries, for example, when you have to execute it in a different context.
 
@@ -49,7 +49,9 @@ npx prisma generate
 To make use of the function abstraction easier as possible, we have made it export TSPrisma namespace, which contains all the necessary types and functions to define your queries. Type assertion is needed because of [this issue](https://github.com/microsoft/TypeScript/issues/33014). Here's an example of how to define a query function using the function abstraction:
 
 ```typescript
-import { TSPrisma } from '@prisma/client';
+import { TSPrisma, PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export async function db<
   N extends TSPrisma.AllModelNamesLowercase,
@@ -68,9 +70,9 @@ It's really that simple! Now you can use the `db` function to execute your queri
 </details>
 
 <details>
-<summary>Automatic Include Objects!</summary>
+<summary>Automatic Include Objects</summary>
 
-## Automatic Include Objects!!
+## Automatic Include Objects
 
 `ts-prisma` also provides a utility function to automatically include all your model's relationships. This function is useful when you want to include all relationships in your query without having to manually specify them each time, [really](https://github.com/prisma/prisma/issues/23088) Prisma? 😒
 
@@ -84,7 +86,7 @@ import { TSPrisma, PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 (async () => {
-  const user = await TSPrisma.findUnique(prisma.user, {
+  const user = await prisma.user.findUnique({
     ...TSPrisma.Functions.getIncludesLowercase('user', 'findUnique'),
     where: { id: 1 },
   });
@@ -100,7 +102,9 @@ The `getIncludesLowercase` function will automatically include all relationships
 You can also use the automatic include function with the function abstraction. Type assertion is needed because of [this issue](https://github.com/microsoft/TypeScript/issues/33014). Here's an example of how to use the automatic include function with the `db` function:
 
 ```typescript
-import { TSPrisma } from '@prisma/client';
+import { TSPrisma, PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export async function db<
   N extends TSPrisma.AllModelNamesLowercase,
