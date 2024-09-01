@@ -112,8 +112,8 @@ export function generateDeclarations(models: string[]) {
 	TSPrismaNamespace += 'export type FirstLowercase<S extends string> = S extends `${infer F}${infer R}` ? `${Lowercase<F>}${R}` : S;' + nl(1);
 	TSPrismaNamespace += 'export type FirstUppercase<S extends string> = S extends `${infer F}${infer R}` ? `${Uppercase<F>}${R}` : S;' + nl(2);
 
-	TSPrismaNamespace += 'export type Args<T, M extends AllModelNamesLowercase, A extends AllPrismaMethodsLowercase> = Prisma.SelectSubset<T, AllArgs[FirstLowercase<M>][A]>;' + nl(1);
-	TSPrismaNamespace += 'export type Result<T, M extends AllModelNamesLowercase, A extends AllPrismaMethodsLowercase> = TSPrismaClients<GetResult<TSPrismaPayloads<DefaultArgs>[FirstUppercase<M>], T, A> | null, null, DefaultArgs>[FirstUppercase<M>];' + nl(2);
+	TSPrismaNamespace += 'export type Args<N extends AllModelNamesLowercase, M extends AllPrismaMethodsLowercase, T> = Prisma.SelectSubset<T, AllArgs[FirstLowercase<N>][M]>;' + nl(1);
+	TSPrismaNamespace += 'export type Result<N extends AllModelNamesLowercase, M extends AllPrismaMethodsLowercase, T> = TSPrismaClients<GetResult<TSPrismaPayloads<DefaultArgs>[FirstUppercase<N>], T, M> | null, null, DefaultArgs>[FirstUppercase<M>];' + nl(2);
 
 	TSPrismaNamespace += 'export type AllArgs<A extends DefaultArgs = DefaultArgs> = {' + nl(1);
 	TSPrismaNamespace += '  [T in AllModelNames as FirstLowercase<T>]: {' + nl(1);
@@ -173,21 +173,35 @@ export function generateFile(models: string[], rawFile: string) {
 	TSPrismaFile += '  Functions: {' + nl(1);
 	TSPrismaFile += '    getIncludes: (modelName, method) => TSPrisma.Includes?.[modelName]?.[method] || {},' + nl(1);
 	TSPrismaFile += '    getIncludesLowercase: (modelName, method) => TSPrisma.IncludesLowercase?.[modelName]?.[method] || {},' + nl(1);
+	TSPrismaFile += '    computeArgs: (args) => {' + nl(1);
+	TSPrismaFile += '      return {' + nl(1);
+	TSPrismaFile += '        ...TSPrisma.Functions.getIncludes(modelName, operation),' + nl(1);
+	TSPrismaFile += '        ...args,' + nl(1);
+	TSPrismaFile += '      };' + nl(1);
+	TSPrismaFile += '    },' + nl(1);
 	TSPrismaFile += '  }' + nl(1);
 	TSPrismaFile += '}' + nl(2);
+
+	TSPrismaTypes += 'export type IncludesArgs<N extends AllModelNamesLowercase, M extends AllPrismaMethodsLowercase, T> = T & (typeof IncludesLowercase)[N][M];' + nl(1);
+	TSPrismaTypes += 'export type IncludesResult<N extends AllModelNamesLowercase, M extends AllPrismaMethodsLowercase, T> = TSPrismaClients<GetResult<TSPrismaPayloads<DefaultArgs>[FirstUppercase<N>], IncludesArgs<N, M, T>, M> | null, null, DefaultArgs>[FirstUppercase<N>];' + nl(2);
 
 	TSPrismaTypes += 'export const Includes: ' + stringifyWithoutQuotes(TSPrisma.Includes) + ';' + nl(2);
 	TSPrismaTypes += 'export const IncludesLowercase: ' + stringifyWithoutQuotes(TSPrisma.IncludesLowercase) + ';' + nl(2);
 
 	TSPrismaTypes += 'export const Functions: {' + nl(1);
 	TSPrismaTypes += '  getIncludes: <' + nl(1);
-	TSPrismaTypes += '    N extends keyof typeof TSPrisma.Includes,' + nl(1);
-	TSPrismaTypes += '    M extends keyof typeof TSPrisma.Includes[N]' + nl(1);
-	TSPrismaTypes += '  >(modelName: N, method: M) => typeof TSPrisma.Includes[N][M] extends boolean ? {} : typeof TSPrisma.Includes[N][M],' + nl(1);
+	TSPrismaTypes += '    N extends keyof typeof Includes,' + nl(1);
+	TSPrismaTypes += '    M extends keyof typeof Includes[N]' + nl(1);
+	TSPrismaTypes += '  >(modelName: N, method: M) => typeof Includes[N][M] extends boolean ? {} : typeof Includes[N][M],' + nl(1);
 	TSPrismaTypes += '  getIncludesLowercase: <' + nl(1);
-	TSPrismaTypes += '    N extends keyof typeof TSPrisma.IncludesLowercase,' + nl(1);
-	TSPrismaTypes += '    M extends keyof typeof TSPrisma.IncludesLowercase[N]' + nl(1);
-	TSPrismaTypes += '  >(modelName: N, method: M) => typeof TSPrisma.IncludesLowercase[N][M] extends boolean ? {} : typeof TSPrisma.IncludesLowercase[N][M],' + nl(1);
+	TSPrismaTypes += '    N extends keyof typeof IncludesLowercase,' + nl(1);
+	TSPrismaTypes += '    M extends keyof typeof IncludesLowercase[N]' + nl(1);
+	TSPrismaTypes += '  >(modelName: N, method: M) => typeof IncludesLowercase[N][M] extends boolean ? {} : typeof IncludesLowercase[N][M],' + nl(1);
+	TSPrismaTypes += '  computeArgs: <' + nl(1);
+	TSPrismaTypes += '    T extends AllModelNamesLowercase,' + nl(1);
+	TSPrismaTypes += '    M extends AllPrismaMethodsLowercase,' + nl(1);
+	TSPrismaTypes += '    A extends AllArgs[T][M]' + nl(1);
+	TSPrismaTypes += '  >(args: Args<T, M, A>) => IncludesArgs<T, M, A>;' + nl(1);
 	TSPrismaTypes += '}';
 
 	return { TSPrismaFile, TSPrismaTypes };

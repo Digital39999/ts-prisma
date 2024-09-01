@@ -38,7 +38,7 @@ npx prisma generate
 ## Basic Usage
 
 <details>
-<summary style="font-size: 1.5rem; font-weight: bold;">Function Abstraction</summary>
+<summary>Function Abstraction</summary>
 
 ## Function Abstraction!!
 
@@ -46,21 +46,20 @@ npx prisma generate
 
 ### Using the Function Abstraction
 
-To make use of the function abstraction easier as possible, we have made it export TSPrisma namespace, which contains all the necessary types and functions to define your queries.
-Here's an example of how to define a query function using the function abstraction:
+To make use of the function abstraction easier as possible, we have made it export TSPrisma namespace, which contains all the necessary types and functions to define your queries. Type assertion is needed because of [this issue](https://github.com/microsoft/TypeScript/issues/33014). Here's an example of how to define a query function using the function abstraction:
 
 ```typescript
 import { TSPrisma } from '@prisma/client';
 
 export async function db<
-  T extends TSPrisma.AllModelNamesLowercase,
+  N extends TSPrisma.AllModelNamesLowercase,
   M extends TSPrisma.AllPrismaMethodsLowercase,
-  A extends TSPrisma.AllArgs[T][M],
+  T extends TSPrisma.AllArgs[N][M],
 >(
-  modelName: T,
+  modelName: N,
   operation: M,
-  args: TSPrisma.Args<A, T, M>,
-): Promise<TSPrisma.Result<A, T, M>> {
+  args: TSPrisma.Args<N, M, T>,
+): Promise<TSPrisma.Result<N, M, T>> {
   return await (prisma[modelName][operation] as TSPrisma.Callable)(args) as never; // yes this Callable is needed because https://github.com/microsoft/TypeScript/issues/33014
 }
 ```
@@ -69,7 +68,63 @@ It's really that simple! Now you can use the `db` function to execute your queri
 </details>
 
 <details>
-<summary style="font-size: 1.5rem; font-weight: bold;">Type Maps</summary>
+<summary>Automatic Include Objects!</summary>
+
+## Automatic Include Objects!!
+
+`ts-prisma` also provides a utility function to automatically include all your model's relationships. This function is useful when you want to include all relationships in your query without having to manually specify them each time, [really](https://github.com/prisma/prisma/issues/23088) Prisma? 😒
+
+### Using the Automatic Include Function
+
+To use the automatic include function, you can use the `TSPrisma` namespace. Here's an example of how to use the automatic include function:
+
+```typescript
+import { TSPrisma, PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+(async () => {
+  const user = await TSPrisma.findUnique(prisma.user, {
+    ...TSPrisma.Functions.getIncludesLowercase('user', 'findUnique'),
+    where: { id: 1 },
+  });
+
+  console.log(user);
+})();
+```
+
+The `getIncludesLowercase` function will automatically include all relationships for the specified model and method. You can then pass the result to the `findUnique` function to execute the query.
+
+### Using the Automatic Include with Function Abstraction
+
+You can also use the automatic include function with the function abstraction. Type assertion is needed because of [this issue](https://github.com/microsoft/TypeScript/issues/33014). Here's an example of how to use the automatic include function with the `db` function:
+
+```typescript
+import { TSPrisma } from '@prisma/client';
+
+export async function db<
+  N extends TSPrisma.AllModelNamesLowercase,
+  M extends TSPrisma.AllPrismaMethodsLowercase,
+  T extends TSPrisma.AllArgs[T][M],
+>(
+  modelName: N,
+  operation: M,
+  args: TSPrisma.Args<N, M, T>,
+): Promise<TSPrisma.IncludesResult<N, M, T>> { // Result is now IncludesResult
+  const newArgs = TSPrisma.Functions.computeArgs(args);
+  return await (prisma[modelName][operation] as TSPrisma.Callable)(newArgs) as never; // yes this Callable is needed
+}
+
+(async () => {
+  const user = await db('user', 'findUnique', {
+    where: { id: 1 },
+  });
+
+  console.log(user.someObject);
+```
+
+<details>
+<summary>Type Maps</summary>
 
 ## Type Maps!!
 
@@ -119,7 +174,7 @@ type AllPayloads = TSPrisma.TSPrismaPayloads;
 </details>
 
 <details>
-<summary style="font-size: 1.5rem; font-weight: bold;">Raw Models and Enums</summary>
+<summary>Raw Models and Enums</summary>
 
 ## Raw Models and Enums
 
