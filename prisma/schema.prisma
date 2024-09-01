@@ -24,7 +24,7 @@ model User {
   test Test
 
   nestedObject NestedObject?
-  someArray    SomeArray[]
+  // someArray    SomeArray[]
 }
 
 model NestedObject {
@@ -32,62 +32,62 @@ model NestedObject {
   name String
 
   levelDeeper      LevelDeeper?
-  levelDeeperArray LevelDeeperArray[]
+  // levelDeeperArray LevelDeeperArray[]
 
   user   User @relation(fields: [userId], references: [id])
   userId Int  @unique
 }
 
-model SomeArray {
-  id   Int    @id @default(autoincrement())
-  name String
+// model SomeArray {
+//   id   Int    @id @default(autoincrement())
+//   name String
 
-  evenDeeper      EvenDeeperProp?
+//   evenDeeper      EvenDeeperProp?
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int  @unique
-}
+//   user   User @relation(fields: [userId], references: [id])
+//   userId Int  @unique
+// }
 
 model LevelDeeper {
   id   Int    @id @default(autoincrement())
   name String
 
-  evenDeeper EvenDeeper?
+  // evenDeeper EvenDeeper?
 
   nestedObject   NestedObject @relation(fields: [nestedObjectId], references: [id])
   nestedObjectId Int          @unique
 }
 
-model LevelDeeperArray {
-  id   Int    @id @default(autoincrement())
-  name String
+// model LevelDeeperArray {
+//   id   Int    @id @default(autoincrement())
+//   name String
 
-  evenDeeperArray EvenDeeperArray[]
+//   evenDeeperArray EvenDeeperArray[]
 
-  nestedObject   NestedObject @relation(fields: [nestedObjectId], references: [id])
-  nestedObjectId Int          @unique
-}
+//   nestedObject   NestedObject @relation(fields: [nestedObjectId], references: [id])
+//   nestedObjectId Int          @unique
+// }
 
-model EvenDeeper {
-  id   Int    @id @default(autoincrement())
-  name String
+// model EvenDeeper {
+//   id   Int    @id @default(autoincrement())
+//   name String
 
-  levelDeeper   LevelDeeper @relation(fields: [levelDeeperId], references: [id])
-  levelDeeperId Int         @unique
-}
+//   levelDeeper   LevelDeeper @relation(fields: [levelDeeperId], references: [id])
+//   levelDeeperId Int         @unique
+// }
 
-model EvenDeeperArray {
-  id   Int    @id @default(autoincrement())
-  name String
+// model EvenDeeperArray {
+//   id   Int    @id @default(autoincrement())
+//   name String
 
-  levelDeeperArray   LevelDeeperArray @relation(fields: [levelDeeperArrayId], references: [id])
-  levelDeeperArrayId Int              @unique
-}
+//   levelDeeperArray   LevelDeeperArray @relation(fields: [levelDeeperArrayId], references: [id])
+//   levelDeeperArrayId Int              @unique
+// }
 
-model EvenDeeperProp {
-  id   Int    @id @default(autoincrement())
-  name String
+// model EvenDeeperProp {
+//   id   Int    @id @default(autoincrement())
+//   name String
 
-  someArray   SomeArray @relation(fields: [someArrayId], references: [id])
-  someArrayId Int       @unique
-}
+//   someArray   SomeArray @relation(fields: [someArrayId], references: [id])
+//   someArrayId Int       @unique
+// }

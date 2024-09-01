@@ -58,6 +58,19 @@ export type OmitNameProperty<Name extends string, T extends TypeMapPayload['obje
     [K in Exclude<keyof T, Name>]: T[K];
 }
 
+export type IncludeStructure = { [key: string]: IncludeStructure | true; };
+export type RuntimeSchema = { [key: string]: RuntimeSchema } | null;
+export type TraversedSchema<T, N extends string = string, M extends string = string> = {
+	[x in N]: {
+		[y in M]: T;
+	};
+}
+
+export type SourceObject<N extends string = string, M extends string = string> = {
+    Includes: TraversedSchema<IncludeStructure, N, M>;
+    IncludesLowercase: TraversedSchema<IncludeStructure, N, M>;
+}
+
 export type TransformPayloadWithoutRecursive<T extends TypeMapPayload, ReferenceKey extends boolean = false> = ExtractScalars<T> & TransformObjectsWithoutRecursive<ExtractObjects<T>, FirstLowercase<T['name']>, ReferenceKey>;
 export type TransformObjectsWithoutRecursive<O extends TypeMapObject, PreviousName extends string, ReferenceKey extends boolean = false> = {
     [K in keyof O]:

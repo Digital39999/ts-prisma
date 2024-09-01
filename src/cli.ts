@@ -1,10 +1,17 @@
 import { generatorHandler } from '@prisma/generator-helper';
+import { generateIncludes } from './schema';
+import { SourceObject } from './types';
 import path from 'path';
 import fs from 'fs';
 
-export type AllArgs = typeof allArgs[number];
+export type AllFunctionsType = typeof AllFunctions[number];
+export type TypeForModel<T extends string> = `${T}${AllFunctionsType}`;
 
-const allArgs = [
+export const firstLowercase = (str: string) => str.charAt(0).toLowerCase() + str.slice(1);
+export const replaceSpace = (str: string) => str.replace(/ {6,}\{/g, ' {');
+export const nl = (amount: number = 1) => '\n'.repeat(amount);
+
+const AllFunctions = [
 	'FindFirst',
 	'FindUnique',
 	'FindMany',
@@ -19,8 +26,6 @@ const allArgs = [
 	'Aggregate',
 ] as const;
 
-export type TypeForModel<T extends string> = `${T}${AllArgs}`;
-
 generatorHandler({
 	onManifest() {
 		return {
@@ -31,88 +36,168 @@ generatorHandler({
 	},
 	async onGenerate(options) {
 		const models = options.dmmf.datamodel.models.map((model) => model.name);
-		const nl = '\n';
 
 		const clientGenerator = options.otherGenerators.find((generator) => generator.provider.value === 'prisma-client-js');
 		if (!clientGenerator?.output?.value) throw new Error('[TS Prisma] Prisma Client Generator output not found!');
 
 		const indexFile = fs.readFileSync(path.join(clientGenerator.output.value, 'index.d.ts'), 'utf-8');
-		const isRef = indexFile.split(nl).filter((line) => line).length === 1;
+		const isRef = indexFile.split(nl(1)).filter((line) => line).length === 1;
 
 		const actualIndexFolder = isRef
 			? path.join(clientGenerator.output.value, '..', '..', '.prisma', 'client')
 			: path.join(clientGenerator.output.value);
 
-		const getArgsName = (model: string, arg: AllArgs) => `Prisma.${model}${arg}Args<T>;`;
+		const fileDirs = {
+			indexFile: path.join(actualIndexFolder, 'index.d.ts'),
+			defaultFile: path.join(actualIndexFolder, 'default.d.ts'),
+			tsPrismaFile: path.join(actualIndexFolder, 'ts-prisma.d.ts'),
+			prismaFile: path.join(actualIndexFolder, 'index.js'),
+			prismaBrowserFile: path.join(actualIndexFolder, 'index-browser.js'),
+		};
 
-		/* Leaving this here for easier debugging in the future..
-			import { Prisma, TSPrisma, TSPrismaClients, TSPrismaPayloads } from '@prisma/client';
-			import { DefaultArgs, GetResult } from '@prisma/client/runtime/library';
-			import { FirstLowercase, FirstUppercase } from 'ts-prisma';
+		const defaultExport = fs.readFileSync(fileDirs.defaultFile, 'utf-8').trim();
+		fs.writeFileSync(fileDirs.defaultFile, defaultExport + nl(1) + 'export * from \'./ts-prisma\'');
 
-			export type AllModelNames = keyof TSPrisma;
-			export type AllModelNamesLowercase = FirstLowercase<AllModelNames>;
-			export type AllPrismaMethods = keyof TSPrisma[keyof TSPrisma];
-			export type AllPrismaMethodsLowercase = FirstLowercase<AllPrismaMethods>;
+		const { TSPrismaImports, TSPrismaNamespace, TSPrismaImportsWithoutPrisma } = generateDeclarations(models);
+		const TempNamespace = wrapAndIndentInNamespace('TSPrisma', TSPrismaNamespace);
 
-			export type Args<T, M extends AllModelNamesLowercase, A extends AllPrismaMethodsLowercase> = Prisma.SelectSubset<T, AllArgs[FirstLowercase<M>][A]>;
-			export type Result<T, M extends AllModelNamesLowercase, A extends AllPrismaMethodsLowercase> = TSPrismaClients<GetResult<TSPrismaPayloads<DefaultArgs>[FirstUppercase<M>], T, A> | null, null, DefaultArgs>[FirstUppercase<M>];
+		const indexFileContent = fs.readFileSync(fileDirs.indexFile, 'utf-8');
+		const newIndexContent = TSPrismaImportsWithoutPrisma + nl(1) + TempNamespace + indexFileContent;
 
-			export type AllArgs<A extends DefaultArgs = DefaultArgs> = {
-				[T in AllModelNames as FirstLowercase<T>]: {
-					[K in AllPrismaMethods as FirstLowercase<K>]: TSPrisma<A>[T][K];
-				};
-			};
-		*/
+		const { TSPrismaFile, TSPrismaTypes } = generateFile(models, newIndexContent);
 
-		let TSPrismaImports = '';
-		TSPrismaImports += 'import { DefaultArgs, GetResult } from \'@prisma/client/runtime/library\';' + nl;
-		TSPrismaImports += 'import { FirstLowercase, FirstUppercase } from \'ts-prisma\';' + nl;
-		TSPrismaImports += 'import { Prisma } from \'@prisma/client\';' + nl + nl;
+		const FinalNamespace = wrapAndIndentInNamespace('TSPrisma', TSPrismaNamespace + TSPrismaTypes);
+		fs.writeFileSync(fileDirs.tsPrismaFile, TSPrismaImports + FinalNamespace);
 
-		let TSPrismaNamespace = '';
-		TSPrismaNamespace += 'export type AllModelNames = keyof TSPrismaModels;' + nl;
-		TSPrismaNamespace += 'export type AllModelNamesLowercase = FirstLowercase<AllModelNames>;' + nl;
-		TSPrismaNamespace += 'export type AllPrismaMethods = keyof TSPrismaModels[keyof TSPrismaModels];' + nl;
-		TSPrismaNamespace += 'export type AllPrismaMethodsLowercase = FirstLowercase<AllPrismaMethods>;' + nl + nl;
-
-		TSPrismaNamespace += 'export type Callable = <T>(...args: T[]) => unknown;' + nl + nl;
-
-		TSPrismaNamespace += 'export type Args<T, M extends AllModelNamesLowercase, A extends AllPrismaMethodsLowercase> = Prisma.SelectSubset<T, AllArgs[FirstLowercase<M>][A]>;' + nl;
-		TSPrismaNamespace += 'export type Result<T, M extends AllModelNamesLowercase, A extends AllPrismaMethodsLowercase> = TSPrismaClients<GetResult<TSPrismaPayloads<DefaultArgs>[FirstUppercase<M>], T, A> | null, null, DefaultArgs>[FirstUppercase<M>];' + nl + nl;
-
-		TSPrismaNamespace += 'export type AllArgs<A extends DefaultArgs = DefaultArgs> = {' + nl;
-		TSPrismaNamespace += '  [T in AllModelNames as FirstLowercase<T>]: {' + nl;
-		TSPrismaNamespace += '    [K in AllPrismaMethods as FirstLowercase<K>]: TSPrismaModels<A>[T][K];' + nl;
-		TSPrismaNamespace += '  };' + nl;
-		TSPrismaNamespace += '};' + nl + nl;
-
-		TSPrismaNamespace += 'export type TSPrismaModels<T extends DefaultArgs = DefaultArgs> = {\n';
-		TSPrismaNamespace += models.map((model) => `  ${model}: {\n${allArgs.map((arg) => `    ${arg}: ${getArgsName(model, arg)}`).join(nl)}\n  };`).join(nl) + nl;
-		TSPrismaNamespace += '};' + nl + nl;
-
-		const getClientName = (model: string) => `Prisma.Prisma__${model}Client<T, Null, ExtArgs>;`;
-
-		TSPrismaNamespace += 'export type TSPrismaClients<T, Null = never, ExtArgs extends DefaultArgs = DefaultArgs> = {' + nl;
-		TSPrismaNamespace += models.map((model) => `  ${model}: ${getClientName(model)}`).join(nl) + nl;
-		TSPrismaNamespace += '};\n\n';
-
-		const getPayloadName = (model: string) => `Prisma.$${model}Payload<T>;`;
-
-		TSPrismaNamespace += 'export type TSPrismaPayloads<T extends DefaultArgs = DefaultArgs> = {\n';
-		TSPrismaNamespace += models.map((model) => `  ${model}: ${getPayloadName(model)}`).join(nl) + nl;
-		TSPrismaNamespace += '};\n';
-
-		const defaultExport = fs.readFileSync(path.join(actualIndexFolder, 'default.d.ts'), 'utf-8').trim();
-		fs.writeFileSync(path.join(actualIndexFolder, 'default.d.ts'), defaultExport + nl + 'export * from \'./ts-prisma.d.ts\'');
-
-
-		const tsPrismaFile = TSPrismaImports + wrapAndIndentInNamespace('TSPrisma', TSPrismaNamespace);
-		fs.writeFileSync(path.join(actualIndexFolder, 'ts-prisma.d.ts'), tsPrismaFile);
-		console.log('TS Prisma types generated!');
+		modifyPrismaFile(fileDirs.prismaFile, TSPrismaFile);
+		modifyPrismaFile(fileDirs.prismaBrowserFile, TSPrismaFile);
 	},
 });
 
+export function modifyPrismaFile(file: string, content: string) {
+	const prismaFileContent = fs.readFileSync(file, 'utf-8').split('\n');
+
+	const prismaLine = prismaFileContent.findIndex((line) => line.includes('const Prisma = {}'));
+	const newPrismaContent = prismaFileContent.reduce((acc, line, index) => {
+		if (index === prismaLine) acc += content;
+		acc += line + nl();
+		return acc;
+	}, '');
+
+	fs.writeFileSync(file, newPrismaContent);
+}
+
 export function wrapAndIndentInNamespace(namespace: string, content: string) {
 	return `export namespace ${namespace} {\n${content.split('\n').map((line) => `  ${line}`).join('\n')}\n}\n`;
+}
+
+export function generateDeclarations(models: string[]) {
+	const getArgsName = (model: string, arg: AllFunctionsType) => `Prisma.${model}${arg}Args<T>;`;
+
+	let TSPrismaImports = '';
+	TSPrismaImports += 'import { DefaultArgs, GetResult } from \'@prisma/client/runtime/library\';' + nl(1);
+
+	const TSPrismaImportsWithoutPrisma = TSPrismaImports;
+
+	TSPrismaImports += 'import { Prisma } from \'@prisma/client\';' + nl(2);
+
+	let TSPrismaNamespace = '';
+	TSPrismaNamespace += 'export type AllModelNames = keyof TSPrismaModels;' + nl(1);
+	TSPrismaNamespace += 'export type AllModelNamesLowercase = FirstLowercase<AllModelNames>;' + nl(1);
+	TSPrismaNamespace += 'export type AllPrismaMethods = keyof TSPrismaModels[keyof TSPrismaModels];' + nl(1);
+	TSPrismaNamespace += 'export type AllPrismaMethodsLowercase = FirstLowercase<AllPrismaMethods>;' + nl(2);
+
+	TSPrismaNamespace += 'export type Callable = <T>(...args: T[]) => unknown;' + nl(2);
+
+	TSPrismaNamespace += 'export type FirstLowercase<S extends string> = S extends `${infer F}${infer R}` ? `${Lowercase<F>}${R}` : S;' + nl(1);
+	TSPrismaNamespace += 'export type FirstUppercase<S extends string> = S extends `${infer F}${infer R}` ? `${Uppercase<F>}${R}` : S;' + nl(2);
+
+	TSPrismaNamespace += 'export type Args<T, M extends AllModelNamesLowercase, A extends AllPrismaMethodsLowercase> = Prisma.SelectSubset<T, AllArgs[FirstLowercase<M>][A]>;' + nl(1);
+	TSPrismaNamespace += 'export type Result<T, M extends AllModelNamesLowercase, A extends AllPrismaMethodsLowercase> = TSPrismaClients<GetResult<TSPrismaPayloads<DefaultArgs>[FirstUppercase<M>], T, A> | null, null, DefaultArgs>[FirstUppercase<M>];' + nl(2);
+
+	TSPrismaNamespace += 'export type AllArgs<A extends DefaultArgs = DefaultArgs> = {' + nl(1);
+	TSPrismaNamespace += '  [T in AllModelNames as FirstLowercase<T>]: {' + nl(1);
+	TSPrismaNamespace += '    [K in AllPrismaMethods as FirstLowercase<K>]: TSPrismaModels<A>[T][K];' + nl(1);
+	TSPrismaNamespace += '  };' + nl(1);
+	TSPrismaNamespace += '};' + nl(2);
+
+	TSPrismaNamespace += 'export type TSPrismaModels<T extends DefaultArgs = DefaultArgs> = {\n';
+	TSPrismaNamespace += models.map((model) => `  ${model}: {\n${AllFunctions.map((arg) => `    ${arg}: ${getArgsName(model, arg)}`).join(nl(1))}\n  };`).join(nl(1)) + nl(1);
+	TSPrismaNamespace += '};' + nl(2);
+
+	const getClientName = (model: string) => `Prisma.Prisma__${model}Client<T, Null, ExtArgs>;`;
+
+	TSPrismaNamespace += 'export type TSPrismaClients<T, Null = never, ExtArgs extends DefaultArgs = DefaultArgs> = {' + nl(1);
+	TSPrismaNamespace += models.map((model) => `  ${model}: ${getClientName(model)}`).join(nl(1)) + nl(1);
+	TSPrismaNamespace += '};' + nl(2);
+
+	const getPayloadName = (model: string) => `Prisma.$${model}Payload<T>;`;
+
+	TSPrismaNamespace += 'export type TSPrismaPayloads<T extends DefaultArgs = DefaultArgs> = {\n';
+	TSPrismaNamespace += models.map((model) => `  ${model}: ${getPayloadName(model)}`).join(nl(1)) + nl(1);
+	TSPrismaNamespace += '};' + nl(2);
+
+	return { TSPrismaImports, TSPrismaNamespace, TSPrismaImportsWithoutPrisma };
+}
+
+export function generateFile(models: string[], rawFile: string) {
+	let TSPrismaFile = '';
+	let TSPrismaTypes = '';
+
+	const TSPrisma: SourceObject = {
+		Includes: {},
+		IncludesLowercase: {},
+	};
+
+	TSPrisma.Includes = generateIncludes(rawFile);
+
+	const splitIncludes = Object.entries(TSPrisma.Includes);
+	TSPrisma.IncludesLowercase = {};
+
+	for (const [key, value] of splitIncludes) {
+		const keyLowercase = firstLowercase(key);
+		const valueSplit = Object.entries(value);
+
+		TSPrisma.IncludesLowercase[keyLowercase] = {};
+
+		for (const [vKey, vValue] of valueSplit) {
+			const vKeyLowercase = firstLowercase(vKey);
+			TSPrisma.IncludesLowercase[keyLowercase][vKeyLowercase] = vValue;
+		}
+	}
+
+	TSPrismaFile += 'exports.TSPrisma = {' + nl(1);
+	TSPrismaFile += '  Includes: ' + stringifyWithoutQuotes(TSPrisma.Includes, 2) + ',' + nl(1);
+	TSPrismaFile += '  IncludesLowercase: ' + stringifyWithoutQuotes(TSPrisma.IncludesLowercase, 2) + ',' + nl(1);
+
+	TSPrismaFile += '  Functions: {' + nl(1);
+	TSPrismaFile += '    getIncludes: (modelName, method) => TSPrisma.Includes?.[modelName]?.[method] || {},' + nl(1);
+	TSPrismaFile += '    getIncludesLowercase: (modelName, method) => TSPrisma.IncludesLowercase?.[modelName]?.[method] || {},' + nl(1);
+	TSPrismaFile += '  }' + nl(1);
+	TSPrismaFile += '}' + nl(2);
+
+	TSPrismaTypes += 'export const Includes: ' + stringifyWithoutQuotes(TSPrisma.Includes) + ';' + nl(2);
+	TSPrismaTypes += 'export const IncludesLowercase: ' + stringifyWithoutQuotes(TSPrisma.IncludesLowercase) + ';' + nl(2);
+
+	TSPrismaTypes += 'export const Functions: {' + nl(1);
+	TSPrismaTypes += '  getIncludes: <' + nl(1);
+	TSPrismaTypes += '    N extends keyof typeof TSPrisma.Includes,' + nl(1);
+	TSPrismaTypes += '    M extends keyof typeof TSPrisma.Includes[N]' + nl(1);
+	TSPrismaTypes += '  >(modelName: N, method: M) => typeof TSPrisma.Includes[N][M] extends boolean ? {} : typeof TSPrisma.Includes[N][M],' + nl(1);
+	TSPrismaTypes += '  getIncludesLowercase: <' + nl(1);
+	TSPrismaTypes += '    N extends keyof typeof TSPrisma.IncludesLowercase,' + nl(1);
+	TSPrismaTypes += '    M extends keyof typeof TSPrisma.IncludesLowercase[N]' + nl(1);
+	TSPrismaTypes += '  >(modelName: N, method: M) => typeof TSPrisma.IncludesLowercase[N][M] extends boolean ? {} : typeof TSPrisma.IncludesLowercase[N][M],' + nl(1);
+	TSPrismaTypes += '}';
+
+	return { TSPrismaFile, TSPrismaTypes };
+}
+
+export function stringifyWithoutQuotes<T>(value: T, indentAmount?: number): string {
+	const data = JSON.stringify(value, null, 2).replace(/"/g, '');
+	return indentAmount ? indent(data, indentAmount) : data;
+}
+
+export function indent(str: string, amount: number) {
+	return str.split('\n').map((line) => ' '.repeat(amount) + line).join('\n');
 }
