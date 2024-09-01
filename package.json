@@ -21,7 +21,6 @@
 		"@babel/parser": "^7.25.6",
 		"@babel/traverse": "^7.25.6",
 		"@babel/types": "^7.25.6",
-		"@prisma/client": "^5.19.0",
 		"@prisma/generator-helper": "^5.19.0"
 	},
 	"devDependencies": {
@@ -29,6 +28,7 @@
 		"@types/node": "^20.14.13",
 		"@typescript-eslint/eslint-plugin": "^6.18.0",
 		"@typescript-eslint/parser": "^6.18.0",
+		"@prisma/client": "^5.19.0",
 		"eslint": "^8.56.0",
 		"prisma": "^5.19.0",
 		"typescript": "^5.3.3"
