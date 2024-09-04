@@ -187,7 +187,7 @@ export function generateFile(models: string[], rawFile: string) {
 	TSPrismaFile += '  getIncludesLowercase: (modelName, method) => TSPrisma.IncludesLowercase?.[modelName]?.[method] || {},' + nl(1);
 	TSPrismaFile += '  computeArgs: (modelName, operation, args) => {' + nl(1);
 	TSPrismaFile += '    return {' + nl(1);
-	TSPrismaFile += '      ...TSPrisma.Functions.getIncludes(modelName, operation),' + nl(1);
+	TSPrismaFile += '      ...TSPrisma.Functions.getIncludesLowercase(modelName, operation),' + nl(1);
 	TSPrismaFile += '      ...args,' + nl(1);
 	TSPrismaFile += '    };' + nl(1);
 	TSPrismaFile += '  },' + nl(1);
