@@ -28,7 +28,7 @@ const prisma = new PrismaClient();
 	});
 
 	const user = await prisma.user.findFirst({
-		...TSPrisma.Functions.getIncludes('User', 'FindFirst'),
+		...TSPrisma.Functions.getIncludes('user', 'findFirst'),
 		where: {
 			email: 'contact@crni.xyz',
 		},
@@ -49,4 +49,30 @@ const prisma = new PrismaClient();
 	test(user);
 
 	console.log(user);
+
+	const userWithIncludes = await db('user', 'findFirst', {
+		where: {
+			email: 'contact@crni.xyz',
+		},
+		include: {
+			
+		},
+	});
+
+	// @ts-expect-error
+	console.log(userWithIncludes?.nestedObject);
 })();
+
+export async function db<
+	N extends TSPrisma.AllModelNamesLowercase,
+	M extends TSPrisma.AllPrismaMethodsLowercase,
+	T extends TSPrisma.AllArgs[N][M],
+>(
+	modelName: N,
+	operation: M,
+	args: TSPrisma.Args<N, M, T>,
+): Promise<TSPrisma.IncludesResult<N, M, T> | null> {
+	const prisma = new PrismaClient();
+	const newArgs = TSPrisma.Functions.computeArgs(modelName, operation, args);
+	return await (prisma[modelName][operation] as TSPrisma.Callable)(newArgs) as never;
+}
