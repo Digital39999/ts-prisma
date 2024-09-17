@@ -61,7 +61,7 @@ generatorHandler({
 		};
 
 		const defaultExport = fs.readFileSync(fileDirs.defaultFile, 'utf-8').trim();
-		fs.writeFileSync(fileDirs.defaultFile, defaultExport + nl(1) + 'export * from \'./ts-prisma\'');
+		fs.writeFileSync(fileDirs.defaultFile, defaultExport + nl(1) + 'export * from \'./ts-prisma.d.ts\'');
 
 		const { TSPrismaImports, TSPrismaNamespace, TSPrismaImportsWithoutPrisma } = generateDeclarations(models, importName);
 		const TempNamespace = wrapAndIndentInNamespace('TSPrisma', TSPrismaNamespace);
