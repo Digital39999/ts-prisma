@@ -41,17 +41,21 @@ generatorHandler({
 		const clientGenerator = options.otherGenerators.find((generator) => generator.provider.value === 'prisma-client-js');
 		if (!clientGenerator?.output?.value) throw new Error('[TS Prisma] Prisma Client Generator output not found!');
 
-		const indexFile = fs.readFileSync(path.join(clientGenerator.output.value, 'index.d.ts'), 'utf-8');
-		const isRef = indexFile.split(nl(1)).filter((line) => line).length === 1;
+		const actualIndexFolder = clientGenerator.isCustomOutput
+			? path.join(clientGenerator.output.value)
+			: path.join(clientGenerator.output.value, '..', '..', '.prisma', 'client');
 
-		const actualIndexFolder = isRef
-			? path.join(clientGenerator.output.value, '..', '..', '.prisma', 'client')
-			: path.join(clientGenerator.output.value);
+
+		const outputDir = path.dirname(clientGenerator.sourceFilePath.replace(/\.prisma$/, ''));
+		const outputValue = path.relative(outputDir, actualIndexFolder);
+
+		const importName = outputValue.endsWith(path.join('.prisma', 'client')) ? '@prisma/client' : (outputValue.startsWith('.') ? outputValue : `./${outputValue}`);
 
 		const fileDirs = {
 			indexFile: path.join(actualIndexFolder, 'index.d.ts'),
 			defaultFile: path.join(actualIndexFolder, 'default.d.ts'),
 			tsPrismaFile: path.join(actualIndexFolder, 'ts-prisma.d.ts'),
+
 			prismaFile: path.join(actualIndexFolder, 'index.js'),
 			prismaBrowserFile: path.join(actualIndexFolder, 'index-browser.js'),
 		};
@@ -59,7 +63,7 @@ generatorHandler({
 		const defaultExport = fs.readFileSync(fileDirs.defaultFile, 'utf-8').trim();
 		fs.writeFileSync(fileDirs.defaultFile, defaultExport + nl(1) + 'export * from \'./ts-prisma\'');
 
-		const { TSPrismaImports, TSPrismaNamespace, TSPrismaImportsWithoutPrisma } = generateDeclarations(models);
+		const { TSPrismaImports, TSPrismaNamespace, TSPrismaImportsWithoutPrisma } = generateDeclarations(models, importName);
 		const TempNamespace = wrapAndIndentInNamespace('TSPrisma', TSPrismaNamespace);
 
 		const indexFileContent = fs.readFileSync(fileDirs.indexFile, 'utf-8');
@@ -92,15 +96,15 @@ export function wrapAndIndentInNamespace(namespace: string, content: string) {
 	return `export namespace ${namespace} {\n${content.split('\n').map((line) => `  ${line}`).join('\n')}\n}\n`;
 }
 
-export function generateDeclarations(models: string[]) {
+export function generateDeclarations(models: string[], prismaImport: string) {
 	const getArgsName = (model: string, arg: AllFunctionsType) => `Prisma.${model}${arg}Args<T>;`;
 
 	let TSPrismaImports = '';
-	TSPrismaImports += 'import { DefaultArgs, GetResult, Narrowable } from \'@prisma/client/runtime/library\';' + nl(1);
+	TSPrismaImports += 'import { DefaultArgs, GetResult, Narrowable } from \'' + prismaImport + '/runtime/library\';' + nl(1);
 
 	const TSPrismaImportsWithoutPrisma = TSPrismaImports;
 
-	TSPrismaImports += 'import { Prisma } from \'@prisma/client\';' + nl(2);
+	TSPrismaImports += 'import { Prisma } from \'' + prismaImport + '\';' + nl(2);
 
 	let TSPrismaNamespace = '';
 	TSPrismaNamespace += 'export type AllModelNames = keyof TSPrismaModels;' + nl(1);
@@ -148,7 +152,11 @@ export function generateDeclarations(models: string[]) {
 	TSPrismaNamespace += models.map((model) => `  ${model}: ${getPayloadName(model)}`).join(nl(1)) + nl(1);
 	TSPrismaNamespace += '};' + nl(2);
 
-	return { TSPrismaImports, TSPrismaNamespace, TSPrismaImportsWithoutPrisma };
+	return {
+		TSPrismaImports: removeEmptyLines(TSPrismaImports),
+		TSPrismaNamespace: removeEmptyLines(TSPrismaNamespace),
+		TSPrismaImportsWithoutPrisma: removeEmptyLines(TSPrismaImportsWithoutPrisma),
+	};
 }
 
 export function generateFile(rawFile: string) {
@@ -212,7 +220,10 @@ export function generateFile(rawFile: string) {
 	TSPrismaTypes += '  >(modelName: N, operation: M, args: Args<N, M, T>) => IncludesArgs<N, M, T>;' + nl(1);
 	TSPrismaTypes += '}';
 
-	return { TSPrismaFile, TSPrismaTypes };
+	return {
+		TSPrismaFile: removeEmptyLines(TSPrismaFile),
+		TSPrismaTypes: removeEmptyLines(TSPrismaTypes),
+	};
 }
 
 export function stringifyWithoutQuotes<T>(value: T, indentAmount?: number): string {
@@ -222,4 +233,8 @@ export function stringifyWithoutQuotes<T>(value: T, indentAmount?: number): stri
 
 export function indent(str: string, amount: number) {
 	return str.split('\n').map((line) => ' '.repeat(amount) + line).join('\n');
+}
+
+export function removeEmptyLines(str: string) {
+	return str.replace(/^\s*[\r\n]/gm, '');
 }
