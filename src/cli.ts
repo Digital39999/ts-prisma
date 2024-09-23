@@ -14,10 +14,13 @@ export const nl = (amount: number = 1) => '\n'.repeat(amount);
 const AllFunctions = [
 	'Default',
 	'FindFirst',
+	'FindFirstOrThrow',
 	'FindUnique',
+	'FindUniqueOrThrow',
 	'FindMany',
 	'Create',
 	'CreateMany',
+	'CreateManyAndReturn',
 	'Update',
 	'UpdateMany',
 	'Upsert',
