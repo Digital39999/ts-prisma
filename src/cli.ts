@@ -20,7 +20,6 @@ const AllFunctions = [
 	'FindMany',
 	'Create',
 	'CreateMany',
-	'CreateManyAndReturn',
 	'Update',
 	'UpdateMany',
 	'Upsert',
