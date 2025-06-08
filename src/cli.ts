@@ -219,7 +219,7 @@ export function generateFile(rawFile: string) {
 	TSPrismaTypes += '    N extends AllModelNamesLowercase,' + nl(1);
 	TSPrismaTypes += '    M extends AllPrismaMethodsLowercase,' + nl(1);
 	TSPrismaTypes += '    T extends AllArgs[N][M]' + nl(1);
-	TSPrismaTypes += '  >(modelName: N, operation: M, args: Args<N, M, T>) => IncludesArgs<N, M, T>;' + nl(1);
+	TSPrismaTypes += '  >(modelName: N, operation: M, args: T | Args<N, M, T>) => IncludesArgs<N, M, T>;' + nl(1);
 	TSPrismaTypes += '}';
 
 	return {
