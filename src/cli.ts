@@ -183,6 +183,7 @@ export function generateFile(rawFile: string) {
 
 		for (const [vKey, vValue] of valueSplit) {
 			const vKeyLowercase = firstLowercase(vKey);
+			if (!TSPrisma.IncludesLowercase[keyLowercase]) TSPrisma.IncludesLowercase[keyLowercase] = {};
 			TSPrisma.IncludesLowercase[keyLowercase][vKeyLowercase] = vValue;
 		}
 	}
