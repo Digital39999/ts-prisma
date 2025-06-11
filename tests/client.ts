@@ -63,16 +63,29 @@ const prisma = new PrismaClient();
 	console.log(userWithIncludes?.nestedObject);
 })();
 
+export type HasSelect<
+	N extends TSPrisma.AllModelNamesLowercase,
+	M extends TSPrisma.AllPrismaMethodsLowercase,
+	T extends TSPrisma.AllArgs[N][M],
+> = 'select' extends keyof T
+	? T['select'] extends Record<string, unknown>
+		? true
+		: false
+	: false;
+
 export async function db<
 	N extends TSPrisma.AllModelNamesLowercase,
 	M extends TSPrisma.AllPrismaMethodsLowercase,
 	T extends TSPrisma.AllArgs[N][M],
+	I extends boolean = true,
 >(
 	modelName: N,
 	operation: M,
-	args: TSPrisma.Args<N, M, T>,
-): Promise<TSPrisma.IncludesResult<N, M, T> | null> {
+	args: T | TSPrisma.Args<N, M, T>,
+	includeAll: I = true as I,
+): Promise<(HasSelect<N, M, T> extends true ? TSPrisma.Result<N, M, T> : I extends true ? TSPrisma.IncludesResult<N, M, T> : TSPrisma.Result<N, M, T>) | null> {
 	const prisma = new PrismaClient();
-	const newArgs = TSPrisma.Functions.computeArgs(modelName, operation, args);
+
+	const newArgs = 'select' in args ? args : includeAll ? TSPrisma.Functions.computeArgs(modelName, operation, args) : args;
 	return await (prisma[modelName][operation] as TSPrisma.Callable)(newArgs) as never;
 }

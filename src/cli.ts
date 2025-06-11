@@ -27,6 +27,7 @@ const AllFunctions = [
 	'DeleteMany',
 	'Count',
 	'Aggregate',
+	'GroupBy',
 ] as const;
 
 generatorHandler({

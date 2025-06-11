@@ -1,5 +1,4 @@
 /* eslint-disable */
-
 import { PrismaEnums, PrismaModels, PrismaModelsClean, PrismaModelsNonRecursive } from '../src/index';
 import { Prisma, $Enums } from '@prisma/client';
 
@@ -19,7 +18,6 @@ type UserM3 = Models['User']['someArray'];
 type UserM4 = Models['User']['nestedObject']['levelDeeper']['nestedObject'];
 type UserM5 = Models['User']['someArray'][number]['user'];
 type UserM6 = Models['User']['someArray'][number]['id'];
-type UserM7 = Models['User']['someArray'][number]['evenDeeper'];
 
 type UserM1C = ModelsClean['User']['id'];
 
@@ -27,10 +25,7 @@ type UserM2NR = ModelsNonRecursive['User']['nestedObject'];
 type UserM3NR = ModelsNonRecursive['User']['someArray'];
 type UserM4NR = ModelsNonRecursive['User']['nestedObject']['levelDeeper'];
 type UserM5NR = ModelsNonRecursive['User']['someArray'][number];
-type UserM6NR = ModelsNonRecursive['User']['nestedObject']['levelDeeper']['evenDeeper'];
 type UserM7NR = ModelsNonRecursive['User']['someArray'][number]['id'];
-type UserM8NR = ModelsNonRecursive['User']['nestedObject']['levelDeeper']['evenDeeper']['id'];
-type UserM9NR = ModelsNonRecursive['User']['someArray'][number]['evenDeeper'];
 
 // invalid
 // @ts-expect-error
