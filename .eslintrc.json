@@ -8,7 +8,6 @@
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended"
     ],
-    "overrides": [],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaVersion": "latest"
@@ -17,6 +16,7 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "@typescript-eslint/no-unused-vars": "warn",
         "brace-style": [
             "error",
             "1tbs",
@@ -24,9 +24,7 @@
                 "allowSingleLine": true
             }
         ],
-        "@typescript-eslint/no-unused-vars": "warn",
         "@typescript-eslint/ban-ts-comment": "off",
-        "@typescript-eslint/no-unsafe-declaration-merging": "off",
         "consistent-return": "off",
         "quotes": [
             "error",
@@ -55,7 +53,10 @@
             "error",
             "never"
         ],
-        "comma-dangle": ["error", "always-multiline"],
+        "comma-dangle": [
+            "error",
+            "always-multiline"
+        ],
         "no-multi-spaces": "error",
         "no-trailing-spaces": "error",
         "no-whitespace-before-property": "off",
