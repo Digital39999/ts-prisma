@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { generatorHandler } from '@prisma/generator-helper';
 import { generateIncludes } from './schema';
 import { SourceObject } from './types';
