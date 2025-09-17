@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { generatorHandler } from '@prisma/generator-helper';
 import { generateIncludes } from './schema';
 import { SourceObject } from './types';
@@ -208,7 +207,7 @@ export function generateFile(rawFile: string) {
 	TSPrismaFile += 'exports.TSPrisma = TSPrisma;' + nl(2);
 
 	TSPrismaTypes += 'export type IncludesArgs<N extends AllModelNamesLowercase, M extends AllPrismaMethodsLowercase, T> = T & (typeof Includes)[N][M];' + nl(1);
-	TSPrismaTypes += 'export type IncludesResult<N extends AllModelNamesLowercase, M extends AllPrismaMethodsLowercase, T> = TSPrismaClients<GetResult<TSPrismaPayloads<DefaultArgs>[FirstUppercase<N>], T extends { include: unknown; } ? T : IncludesArgs<N, M, T>, M> | null, null, DefaultArgs>[FirstUppercase<N>];' + nl(2);
+	TSPrismaTypes += 'export type IncludesResult<N extends AllModelNamesLowercase, M extends AllPrismaMethodsLowercase, T> = TSPrismaClients<GetResult<TSPrismaPayloads<DefaultArgs>[FirstUppercase<N>], T extends { include: unknown; } | { select: unknown; } ? T : IncludesArgs<N, M, T>, M> | null, null, DefaultArgs>[FirstUppercase<N>];' + nl(2);
 
 	TSPrismaTypes += 'export const Includes: ' + stringifyWithoutQuotes(TSPrisma.IncludesLowercase) + ';' + nl(2);
 
